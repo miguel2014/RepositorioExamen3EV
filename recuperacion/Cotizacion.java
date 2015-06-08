@@ -6,10 +6,10 @@ public class Cotizacion {
 	private double maximo;
 	private double minimo;
 	private double cerrar;
-	private String volumen;
+	private  int volumen;
 	private double ajustes_cierre;
 	public Cotizacion(String fecha, double apertura, double maximo,
-			double minimo, double cerrar, String volumen, double ajustes_cierre) {
+			double minimo, double cerrar, int volumen, double ajustes_cierre) {
 		super();
 		this.fecha = fecha;
 		this.apertura = apertura;
@@ -49,10 +49,10 @@ public class Cotizacion {
 	public void setCerrar(double cerrar) {
 		this.cerrar = cerrar;
 	}
-	public String getVolumen() {
+	public int getVolumen() {
 		return volumen;
 	}
-	public void setVolumen(String volumen) {
+	public void setVolumen(int volumen) {
 		this.volumen = volumen;
 	}
 	public double getAjustes_cierre() {

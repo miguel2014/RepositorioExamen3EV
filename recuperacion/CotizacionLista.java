@@ -32,10 +32,15 @@ public class CotizacionLista {
 	public void setCerrar(int cerrar,int posicion){
 		lista.get(posicion).setCerrar(cerrar);
 	};
-	public void setVolumen(String volumen,int posicion){
+	public void setVolumen(int volumen,int posicion){
 		lista.get(posicion).setVolumen(volumen);
 	};
 	public void setAjustesCierre(int ajustes_cierre,int posicion){
 		lista.get(posicion).setAjustes_cierre(ajustes_cierre);
+	}
+	@Override
+	public String toString() {
+		return "CotizacionLista [lista=" + lista + "]";
 	};
+	
 }

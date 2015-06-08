@@ -2,10 +2,14 @@ package recuperacion;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -23,22 +27,26 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.SwingConstants;
 
 public class InterfazCotizacionBolsa {
 
 	private JFrame frame;
-	private List<String> lista;//Lista Original
-	private CotizacionLista listacotizacion;
+	private List<String> lista=new ArrayList<String>();//Lista Original
+	private CotizacionLista listacotizacion=new CotizacionLista();
 	private String campos[];
 	private String texto;
-	private JTable table;
+	private JTable tabla;
+	private String fecha;
 	private double apertura;
 	private double maximo;
 	private double minimo;
 	private double cerrar;
-	private String volumen;;
+	private int volumen;
 	private double ajustes_cierre;
+	private LocalTime horaactual=LocalTime.now();
+	private LocalDate diaactual=LocalDate.now();
 	/**
 	 * Launch the application.
 	 */
@@ -84,7 +92,7 @@ public class InterfazCotizacionBolsa {
 				int returnval=chooser.showOpenDialog(frame);
 				if (returnval==JFileChooser.APPROVE_OPTION) {
 					File fichero=chooser.getSelectedFile();
-					lista=new ArrayList<String>();
+				
 					try (Scanner in=new Scanner(fichero);){
 						in.useDelimiter("\t");
 						while(in.hasNextLine()){
@@ -93,20 +101,26 @@ public class InterfazCotizacionBolsa {
 							lista.add(texto);
 						}
 						lista.remove(0);
-						listacotizacion=new CotizacionLista();
-						System.out.println(lista);
+						String[] nombreColumnas = {"Fecha","Apertura","Maximo","Minimo","Cerrar","Volumen","Ajustes de cierre"};
+						
+	
+						
 						for (int i = 0; i < lista.size(); i++) {
 							campos=lista.get(i).split("\t");
-							String fecha=campos[0];
+							fecha=campos[0];
 							apertura=Double.parseDouble(campos[1]);
 							maximo=Double.parseDouble(campos[2]);
 							minimo=Double.parseDouble(campos[3]);
 							cerrar=Double.parseDouble(campos[4]);
-							//volumen=Double.parseDouble(campos[5]);
-							//ajustes_cierre=Double.parseDouble(campos[6]);
-							//listacotizacion.addCotizacion(new Cotizacion(fecha, apertura, maximo, minimo, cerrar, volumen, ajustes_cierre));
+							volumen=Integer.parseInt(campos[5].replace(".",""));
+							ajustes_cierre=Double.parseDouble(campos[6]);
+							listacotizacion.addCotizacion(new Cotizacion(fecha, apertura, maximo, minimo, cerrar, volumen, ajustes_cierre));
 						}
-						System.out.println(listacotizacion);
+
+						//JTableModelCotizacion modelo=new JTableModelCotizacion(listacotizacion,nombreColumnas);
+						
+						tabla = new JTable();
+						
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -120,8 +134,35 @@ public class InterfazCotizacionBolsa {
 		opcionFicheroGuardar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooserguardar=new JFileChooser();
+				FileNameExtensionFilter filtro = new FileNameExtensionFilter("*.csv", "csv");
+				chooserguardar.setFileFilter(filtro);
 				int returnval=chooserguardar.showSaveDialog(frame);
-				
+				if (lista.isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "Has de introducir datos");
+				}
+				else{
+				if (returnval==JFileChooser.APPROVE_OPTION) {
+					String formato=diaactual.getDayOfMonth()+"-"+diaactual.getMonthValue()+"-"+diaactual.getYear()+"_"+horaactual.getHour()+":"+horaactual.getMinute()+":"+
+							horaactual.getSecond()+".csv";
+					String outFile=chooserguardar.getSelectedFile()+" "+formato;
+					try (PrintWriter out=new PrintWriter(outFile);){
+							for (int i = 0; i < listacotizacion.getTamañoLista(); i++) {
+								fecha=listacotizacion.getPosicion(i).getFecha();
+								apertura=listacotizacion.getPosicion(i).getApertura();
+								maximo=listacotizacion.getPosicion(i).getMaximo();
+								minimo=listacotizacion.getPosicion(i).getMinimo();
+								cerrar=listacotizacion.getPosicion(i).getCerrar();
+								volumen=listacotizacion.getPosicion(i).getVolumen();
+								ajustes_cierre=listacotizacion.getPosicion(i).getAjustes_cierre();
+								texto=fecha+";"+apertura+";"+maximo+";"+minimo+";"+cerrar+";"+volumen+";"+ajustes_cierre+"\n";
+								out.write(texto);
+							}
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
 			}
 		});
 		menuFichero.add(opcionFicheroGuardar);
@@ -140,6 +181,7 @@ public class InterfazCotizacionBolsa {
 		JMenuItem opcionAyudaAcercaDe = new JMenuItem("Acerca de");
 		opcionAyudaAcercaDe.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				JOptionPane.showMessageDialog(frame, "Realizado por Miguel Angel Gutierrez Delgado");
 			}
 		});
@@ -173,13 +215,10 @@ public class InterfazCotizacionBolsa {
 					.addComponent(botonSiguiente)
 					.addComponent(botonModificar))
 		);
-		panel.setLayout(gl_panel);
+		JScrollPane scrollPane = new JScrollPane(tabla);
 		
-		table = new JTable();
-		frame.getContentPane().add(table, BorderLayout.CENTER);
-		
-		JScrollPane scrollPane = new JScrollPane();
 		frame.getContentPane().add(scrollPane, BorderLayout.NORTH);
+		
 	}
 
 }
