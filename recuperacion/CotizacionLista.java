@@ -24,22 +24,22 @@ public class CotizacionLista {
 	public void setFecha(String fecha,int posicion){
 		lista.get(posicion).setFecha(fecha);
 	};
-	public void setApertura(int apertura,int posicion){
+	public void setApertura(double apertura,int posicion){
 		lista.get(posicion).setApertura(apertura);;
 	};
-	public void setMaximo(int maximo,int posicion){
+	public void setMaximo(double maximo,int posicion){
 		lista.get(posicion).setMaximo(maximo);
 	};
-	public void setMinimo(int minimo,int posicion){
+	public void setMinimo(double minimo,int posicion){
 		lista.get(posicion).setMinimo(minimo);
 	};
-	public void setCerrar(int cerrar,int posicion){
+	public void setCerrar(double cerrar,int posicion){
 		lista.get(posicion).setCerrar(cerrar);
 	};
 	public void setVolumen(int volumen,int posicion){
 		lista.get(posicion).setVolumen(volumen);
 	};
-	public void setAjustesCierre(int ajustes_cierre,int posicion){
+	public void setAjustesCierre(double ajustes_cierre,int posicion){
 		lista.get(posicion).setAjustes_cierre(ajustes_cierre);
 	}
 	@Override
