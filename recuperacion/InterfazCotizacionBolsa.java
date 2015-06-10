@@ -2,7 +2,6 @@ package recuperacion;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -37,7 +36,6 @@ public class InterfazCotizacionBolsa {
 	private CotizacionLista listacotizacion=new CotizacionLista();
 	private String campos[];
 	private String texto;
-	private JTable tabla;
 	private String fecha;
 	private double apertura;
 	private double maximo;
@@ -47,6 +45,9 @@ public class InterfazCotizacionBolsa {
 	private double ajustes_cierre;
 	private LocalTime horaactual=LocalTime.now();
 	private LocalDate diaactual=LocalDate.now();
+	List<Cotizacion> listaprueba=new ArrayList<Cotizacion>();
+	private JTable table;
+	private JTableModelCotizacion modelotabla;
 	/**
 	 * Launch the application.
 	 */
@@ -101,7 +102,6 @@ public class InterfazCotizacionBolsa {
 							lista.add(texto);
 						}
 						lista.remove(0);
-						String[] nombreColumnas = {"Fecha","Apertura","Maximo","Minimo","Cerrar","Volumen","Ajustes de cierre"};
 						
 	
 						
@@ -115,11 +115,26 @@ public class InterfazCotizacionBolsa {
 							volumen=Integer.parseInt(campos[5].replace(".",""));
 							ajustes_cierre=Double.parseDouble(campos[6]);
 							listacotizacion.addCotizacion(new Cotizacion(fecha, apertura, maximo, minimo, cerrar, volumen, ajustes_cierre));
+							//listaprueba.add(new Cotizacion(fecha, apertura, maximo, minimo, cerrar, volumen, ajustes_cierre));
 						}
 
-						//JTableModelCotizacion modelo=new JTableModelCotizacion(listacotizacion,nombreColumnas);
+						modelotabla=new JTableModelCotizacion(listacotizacion.getLista());
 						
-						tabla = new JTable();
+						JPanel panel_2 = new JPanel();
+						frame.getContentPane().add(panel_2, BorderLayout.CENTER);
+						
+						JScrollPane scrollPane = new JScrollPane();
+						
+						panel_2.add(scrollPane);
+						table = new JTable(modelotabla);
+						panel_2.add(table);
+						scrollPane.setViewportView(table);
+		
+						
+						
+						
+						
+						
 						
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
@@ -144,8 +159,10 @@ public class InterfazCotizacionBolsa {
 				if (returnval==JFileChooser.APPROVE_OPTION) {
 					String formato=diaactual.getDayOfMonth()+"-"+diaactual.getMonthValue()+"-"+diaactual.getYear()+"_"+horaactual.getHour()+":"+horaactual.getMinute()+":"+
 							horaactual.getSecond()+".csv";
+					String cabecera="Fecha;Apertura;Maximo;Minimo;Cerrar;Volumen;Ajustes de cierre\n";
 					String outFile=chooserguardar.getSelectedFile()+" "+formato;
 					try (PrintWriter out=new PrintWriter(outFile);){
+						out.write(cabecera);	
 							for (int i = 0; i < listacotizacion.getTamañoLista(); i++) {
 								fecha=listacotizacion.getPosicion(i).getFecha();
 								apertura=listacotizacion.getPosicion(i).getApertura();
@@ -157,6 +174,7 @@ public class InterfazCotizacionBolsa {
 								texto=fecha+";"+apertura+";"+maximo+";"+minimo+";"+cerrar+";"+volumen+";"+ajustes_cierre+"\n";
 								out.write(texto);
 							}
+							
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -191,11 +209,47 @@ public class InterfazCotizacionBolsa {
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
 		JButton botonAnterior = new JButton("Anterior");
+		botonAnterior.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					modelotabla.anteriorFuncion();	
+				} catch (Exception e2) {
+					// TODO: handle exception
+				}
+			}
+		});
 		
 		JButton botonSiguiente = new JButton("Siguiente");
+		botonSiguiente.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					modelotabla.siguienteFuncion();
+					
+				} catch (Exception e2) {
+					// TODO: handle exception
+				}
+				
+			}
+		});
 		botonSiguiente.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		JButton botonModificar = new JButton("Modificar");
+		botonModificar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			try {
+				JTableModelCotizacion tableModel = (JTableModelCotizacion) table.getModel(); 
+				int cols = tableModel.getColumnCount(); 
+				int fils = tableModel.getRowCount(); 
+				for(int i=0; i<fils; i++) { 
+				for(int j=0; j<cols; j++) 
+				System.out.print(tableModel.getValueAt(i,j)); 
+				System.out.println(); 
+			}
+			} catch (Exception e2) {
+				// TODO: handle exception
+			}	
+				
+			}});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -215,10 +269,11 @@ public class InterfazCotizacionBolsa {
 					.addComponent(botonSiguiente)
 					.addComponent(botonModificar))
 		);
-		JScrollPane scrollPane = new JScrollPane(tabla);
 		
-		frame.getContentPane().add(scrollPane, BorderLayout.NORTH);
+		
+		
+		
+		
 		
 	}
-
 }

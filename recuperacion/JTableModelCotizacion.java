@@ -1,6 +1,5 @@
 package recuperacion;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -11,12 +10,14 @@ public class JTableModelCotizacion extends AbstractTableModel{
 	 */
 	private static final long serialVersionUID = 1L;
 	private List<Cotizacion> lista;
-	String [] nombreColumnas;
-	
-	public JTableModelCotizacion(List<Cotizacion> lista,String[] nombreColumnas) {
-		lista=new ArrayList<Cotizacion>();
-		this.nombreColumnas=nombreColumnas;
+	private String[] nombreColumnas = {"Fecha","Apertura","Maximo","Minimo","Cerrar","Volumen","Ajustes de cierre"};
+	private int numfilas=3;
+	private int indice=0;
+
+	public JTableModelCotizacion(List<Cotizacion> lista) {
+		this.lista = lista;
 	}
+	
 
 	@Override
 	public int getRowCount() {
@@ -27,9 +28,23 @@ public class JTableModelCotizacion extends AbstractTableModel{
 	@Override
 	public int getColumnCount() {
 		// TODO Auto-generated method stub
-		return 6;
+		return 7;
+	}
+	public void siguienteFuncion(){
+		if (indice+numfilas<lista.size()) {
+			indice+=numfilas;
+			fireTableChanged(null);
+		}
+		
 	}
 	
+	public void anteriorFuncion(){
+		if (indice-numfilas>=0){
+			indice-=numfilas;
+			fireTableChanged(null);
+		}
+		
+	}
 
 	@Override
 	public String getColumnName(int column) {
@@ -57,11 +72,64 @@ public class JTableModelCotizacion extends AbstractTableModel{
 			return objeto.getVolumen();
 		case 6:
 			return objeto.getAjustes_cierre();
+		default:
+			return "";
 		}
-		return objeto;
 		
 	}
 	
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		Cotizacion objeto = lista.get(rowIndex);
+		String celda=(String) aValue;
+		switch (columnIndex) {
+		case 0:
+			objeto.setFecha(celda);			
+			break;
+		case 1 :
+			try {
+				objeto.setApertura(Double.parseDouble(celda));
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
+			break;
+		case 2:
+			try {
+				objeto.setMaximo(Double.parseDouble(celda));
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			break;
+		case 3:
+			try {
+				objeto.setMinimo(Double.parseDouble(celda));
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		case 4:
+			try {
+				objeto.setCerrar(Double.parseDouble(celda));
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		case 5:
+			try {
+				objeto.setVolumen(Integer.parseInt(celda));
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		case 6:
+			try {
+				objeto.setAjustes_cierre(Double.parseDouble(celda));
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		default:
+			
+		}
+	};
+	
+		
 	@Override
 	public boolean isCellEditable(int fila, int columna) {
 		// TODO Auto-generated method stub

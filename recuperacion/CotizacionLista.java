@@ -11,6 +11,10 @@ public class CotizacionLista {
 	public void addCotizacion(Cotizacion c){
 		lista.add(c);
 	}
+	
+	public List<Cotizacion> getLista() {
+		return lista;
+	}
 	public Cotizacion getPosicion(int i) {
 		return lista.get(i);
 	}
