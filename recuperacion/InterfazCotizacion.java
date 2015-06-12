@@ -1,5 +1,6 @@
 package recuperacion;
 
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -28,6 +29,9 @@ import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.SwingConstants;
+import javax.swing.JLabel;
+import java.awt.Component;
+import javax.swing.Box;
 
 public class InterfazCotizacion {
 
@@ -48,6 +52,9 @@ public class InterfazCotizacion {
 	private JTable table;
 	private JTableModelCotizacion modelotabla;
 	JScrollPane scrollPane;
+	private int contador=0;
+	private JLabel registrolabel;
+	private int numfilas=3;
 	/**
 	 * Launch the application.
 	 */
@@ -95,12 +102,14 @@ public class InterfazCotizacion {
 					File fichero=chooser.getSelectedFile();
 				
 					try (Scanner in=new Scanner(fichero);){
-						in.useDelimiter("\t");
+						in.useDelimiter("\t");//Saltos de linea como delimitador
 						while(in.hasNextLine()){
 							texto=in.nextLine();
-							texto=texto.replaceAll(",", ".");
+							texto=texto.replaceAll(",", ".");//Para poder convertirlo a double
 							lista.add(texto);
 						}
+						//Nos daria fallo la primera linea ya que es un String y a la hora de añadirla a la lista 
+						//de cotizacion daria error por lo que lo eliminamos
 						lista.remove(0);
 						
 	
@@ -116,10 +125,12 @@ public class InterfazCotizacion {
 							ajustes_cierre=Double.parseDouble(campos[6]);
 							listacotizacion.addCotizacion(new Cotizacion(fecha, apertura, maximo, minimo, cerrar, volumen, ajustes_cierre));
 						}
-
+						contador++;
+						registrolabel.setText("Registro " +contador+" de "+(listacotizacion.getTamañoLista()/numfilas));
 						modelotabla=new JTableModelCotizacion(listacotizacion.getLista());
 						table = new JTable(modelotabla);
 						scrollPane.setViewportView(table);
+						
 						
 						
 					} catch (FileNotFoundException e1) {
@@ -191,6 +202,12 @@ public class InterfazCotizacion {
 		});
 		menuAyuda.add(opcionAyudaAcercaDe);
 		
+		Component horizontalStrut = Box.createHorizontalStrut(179);
+		menuBar.add(horizontalStrut);
+		
+		registrolabel = new JLabel("Registro " +contador+" de "+(listacotizacion.getTamañoLista()/numfilas));
+		menuBar.add(registrolabel);
+		
 		JPanel panel = new JPanel();
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
@@ -199,6 +216,13 @@ public class InterfazCotizacion {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					modelotabla.anteriorFuncion();	
+					if (contador<2) {
+						
+					}
+					else{
+						contador--;
+					}
+					registrolabel.setText("Registro " +contador+" de "+(listacotizacion.getTamañoLista()/numfilas));
 				} catch (Exception e2) {
 					// TODO: handle exception
 				}
@@ -210,7 +234,13 @@ public class InterfazCotizacion {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					modelotabla.siguienteFuncion();
-					
+					if (contador==listacotizacion.getTamañoLista()/3) {
+						
+					}
+					else{
+						contador++;
+					}
+					registrolabel.setText("Registro " +contador+" de "+(listacotizacion.getTamañoLista()/numfilas));
 				} catch (Exception e2) {
 					// TODO: handle exception
 				}
@@ -243,7 +273,9 @@ public class InterfazCotizacion {
 				listacotizacion.setVolumen(volumen, i);
 				listacotizacion.setAjustesCierre(ajustes_cierre, i);
 				
-			}
+				}
+				JOptionPane.showMessageDialog(frame, "Modificación hecha con exito","Mensaje",JOptionPane.INFORMATION_MESSAGE);
+				
 			} catch (Exception e2) {
 				// TODO: handle exception
 			}	

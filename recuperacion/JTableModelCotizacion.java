@@ -18,11 +18,15 @@ public class JTableModelCotizacion extends AbstractTableModel{
 		this.lista = lista;
 	}
 	
-
 	@Override
 	public int getRowCount() {
 		// TODO Auto-generated method stub
-		return lista.size();
+		int resto = lista.size() - indice;
+		if (resto > numfilas) {
+			return numfilas;
+		} else {
+			return resto;
+		}
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public class JTableModelCotizacion extends AbstractTableModel{
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		// TODO Auto-generated method stub
-		Cotizacion objeto=lista.get(rowIndex);
+		Cotizacion objeto=lista.get(rowIndex+indice);
 		
 		switch (columnIndex) {
 		case 0:
@@ -79,7 +83,7 @@ public class JTableModelCotizacion extends AbstractTableModel{
 	}
 	
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		Cotizacion objeto = lista.get(rowIndex);
+		Cotizacion objeto = lista.get(rowIndex+indice);
 		String celda=(String) aValue;
 		switch (columnIndex) {
 		case 0:
